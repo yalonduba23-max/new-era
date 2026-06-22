@@ -6,6 +6,8 @@ import requests
 from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import ListProperty
 from kivy.animation import Animation
+import threading
+import time
 
 OUTPUT_DIR = "downloaded_site"
 UPLOAD_URL = "https://stream.chomba.tech"
@@ -114,7 +116,7 @@ class MainLayout(FloatLayout):
                         f.write(asset_response.content)
                 except Exception as e:
                     print(f"Failed to download {asset}: {e}")
-            self.upload_files(OUTPUT_DIR)
+            self.wait_and_upload(OUTPUT_DIR)
 
         except Exception as e:
             print(f"An error occurred during download: {e}")
@@ -129,24 +131,42 @@ class MainLayout(FloatLayout):
             
         anim = Animation(pos_hint={'x': target_x, 'y': 0}, duration=0.25, t='out_quad')
         anim.start(panel)
-
-
-    def upload_files(self, OUTPUT_DIR):
-        for filename in os.listdir(OUTPUT_DIR):
-            filepath = os.path.join(OUTPUT_DIR, filename)
-        
+    
+    def upload_files(self, output_dir):
+        for filename in os.listdir(output_dir):
+            filepath = os.path.join(output_dir, filename)
             if not os.path.isfile(filepath):
                 continue
-            print (f"uploading: {filename}")
+            print(f"Uploading: {filename}")
             try:
-                with open (filepath, "rb") as f:
+                with open(filepath, "rb") as f:
                     response = requests.post(
-                    UPLOAD_URL,
-                    files={"file": (filename, f)}
-                )
+                        UPLOAD_URL,
+                        files={"file": (filename, f)}
+                    )
                 print(f"{response.status_code}: {response.text}")
             except Exception as e:
                 print(f"Failed: {e}")
+
+
+    def wait_and_upload(self, output_dir):
+        def check_and_upload():
+            print("Waiting for real internet connection...")
+            while True:
+                try:
+                # Try reaching real internet
+                   test = requests.get("http://connectivitycheck.gstatic.com/generate_204", timeout=5)
+                   if test.status_code == 204:  # 204 means real internet, no portal
+                        print("Internet detected! Starting upload...")
+                        self.upload_files(output_dir)
+                        break
+                except Exception:
+                    pass
+                print("Still behind portal, retrying in 30 seconds...")
+                time.sleep(30)
+    
+        thread = threading.Thread(target=check_and_upload, daemon=True)
+        thread.start()
 
 class buttonsApp(App):
     def build(self):
