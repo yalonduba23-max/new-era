@@ -29,19 +29,6 @@
                 pos: self.pos
                 size: self.size
 
-    # Small status indicator (0.5 cm radius = 1.0 cm diameter)
-    Widget:
-        id: status_indicator
-        size_hint: None, None
-        size: cm(1.0), cm(1.0)
-        pos_hint: {'center_x': 0.5, 'center_y': 0.3}
-        
-        canvas:
-            Color:
-                rgba: root.indicator_color  # Tied to the Python Property
-            Ellipse:
-                pos: self.pos
-                size: self.size
 
 
     # --- TOP BAR ---

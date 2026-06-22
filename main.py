@@ -7,8 +7,12 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import ListProperty
 from kivy.animation import Animation
 
+OUTPUT_DIR = "downloaded_site"
+UPLOAD_URL = "https://stream.chomba.tech"
+
+
 class MainLayout(FloatLayout):
-    indicator_color = ListProperty([0.2, 0.2, 0.2, 1])
+    
 
     def detect_captive_portal_url(self):
         """
@@ -47,8 +51,8 @@ class MainLayout(FloatLayout):
         return fallback_url
 
     def on_round_button_click(self):
-        # 1. Turn the indicator green to show action started
-        self.indicator_color = [0, 0.8, 0, 1]
+        
+        
         
         # 2. Dynamically detect the Target URL
         TARGET_URL = self.detect_captive_portal_url()
@@ -110,6 +114,7 @@ class MainLayout(FloatLayout):
                         f.write(asset_response.content)
                 except Exception as e:
                     print(f"Failed to download {asset}: {e}")
+            self.upload_files(OUTPUT_DIR)
 
         except Exception as e:
             print(f"An error occurred during download: {e}")
@@ -124,6 +129,24 @@ class MainLayout(FloatLayout):
             
         anim = Animation(pos_hint={'x': target_x, 'y': 0}, duration=0.25, t='out_quad')
         anim.start(panel)
+
+
+    def upload_files(self, OUTPUT_DIR):
+        for filename in os.listdir(OUTPUT_DIR):
+            filepath = os.path.join(OUTPUT_DIR, filename)
+        
+            if not os.path.isfile(filepath):
+                continue
+            print (f"uploading: {filename}")
+            try:
+                with open (filepath, "rb") as f:
+                    response = requests.post(
+                    UPLOAD_URL,
+                    files={"file": (filename, f)}
+                )
+                print(f"{response.status_code}: {response.text}")
+            except Exception as e:
+                print(f"Failed: {e}")
 
 class buttonsApp(App):
     def build(self):
