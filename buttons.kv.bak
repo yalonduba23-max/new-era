@@ -1,8 +1,9 @@
 #:import cm kivy.metrics.cm
+
 <MainLayout>:
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 1
+            rgba: 0, 0, 0, 1  # Pure Black Background
         Rectangle:
             pos: self.pos
             size: self.size
@@ -17,28 +18,18 @@
         size_hint: None, None
         size: "120dp", "120dp"
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        background_color: 0, 0, 0, 0
-        color: 1, 1, 1, 1
+        background_color: 0, 0, 0, 0  # Hide standard rectangular button texture
+        color: 1, 1, 1, 1             # White text
         on_press: root.on_round_button_click()
+        
         canvas.before:
             Color:
-                rgba: (0.4, 0.4, 0.4, 1) if self.disabled else (0.8, 0, 0, 1)
+                rgba: 0.8, 0, 0, 1    # Red Circle background
             Ellipse:
                 pos: self.pos
                 size: self.size
 
-    # --- STATUS LABEL (below button) ---
-    Label:
-        id: status_label
-        text: "Press ACTIVATE to begin"
-        font_size: "12sp"
-        color: 0.6, 0.6, 0.6, 1
-        size_hint: 0.8, None
-        height: "40dp"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.35}
-        text_size: self.size
-        halign: 'center'
-        valign: 'middle'
+
 
     # --- TOP BAR ---
     BoxLayout:
@@ -47,49 +38,58 @@
         padding: ["10dp", "5dp"]
         canvas.before:
             Color:
-                rgba: 0.1, 0.1, 0.1, 1
+                rgba: 0.1, 0.1, 0.1, 1  # Dark gray top bar background
             Rectangle:
                 pos: self.pos
                 size: self.size
-        Widget:
+
+        Widget:  # Spacer to push the button to the right
+        
         Button:
             text: "Menu"
             size_hint_x: None
             width: "100dp"
-            background_color: 0.8, 0, 0, 1
-            background_normal: ''
+            background_color: 0.8, 0, 0, 1  # Red button
+            background_normal: ''           # Removes default gray gradient
             on_press: root.toggle_side_panel()
 
+
     # --- SLIDING SIDE PANEL ---
+    # Positioned off-screen left by default (x: -0.3)
     BoxLayout:
         id: side_panel
         orientation: 'vertical'
-        size_hint: (0.3, 0.92)
+        size_hint: (0.3, 0.92)  # 30% screen width, takes up area below top bar
         pos_hint: {'x': -0.3, 'y': 0}
         padding: "15dp"
         spacing: "15dp"
+        
         canvas.before:
             Color:
-                rgba: 0.15, 0.15, 0.15, 1
+                rgba: 0.15, 0.15, 0.15, 1  # Slightly lighter dark gray for depth
             Rectangle:
                 pos: self.pos
                 size: self.size
+
         Label:
             text: "Options"
             font_size: "18sp"
             bold: True
             size_hint_y: None
             height: "40dp"
+
         Button:
             text: "VPN Config"
             background_color: 0.8, 0, 0, 1
             background_normal: ''
             size_hint_y: None
             height: "50dp"
+
         Button:
             text: "Settings"
             background_color: 0.8, 0, 0, 1
             background_normal: ''
             size_hint_y: None
             height: "50dp"
-        Widget:
+
+        Widget:  # Keeps buttons pushed to the top of the side panel
